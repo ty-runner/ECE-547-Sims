@@ -1,3 +1,11 @@
+# Generate n = 100 continuous random variables uniformly-distributed within the interval
+# [0, n]. Take any sub-interval of length 10. Count how many random variables that you have
+# generated fall into this sub-interval. Let this number be Z, which should be random each
+# time when you execute your code. Generate 100 samples of this random number Z and plot
+# its empirical PMF. Does it fit the PMF of a Poisson random variable? If the fit is less than
+# perfect, increase n to 1000 and try again. What is the mean of the Poisson random variable?
+# (You may want to cross-reference Problem (3).)
+
 import matplotlib.pyplot as plt
 import numpy as np
 

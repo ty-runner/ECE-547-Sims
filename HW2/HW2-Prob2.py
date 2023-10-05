@@ -1,3 +1,9 @@
+# Generate 100 samples of X, and plot the empirical CDF
+# (i.e., you need to estimate P (X ≤ a) from your samples for each value of a). Does it fit the
+# CDF of exponential distribution with mean 10? Further, calculate the empirical mean of the
+# 100 samples of X. Is it close to 10? If any of the fit is less than perfect, try 1000 samples of
+# X. Do the same for Y , except that in this case you can plot the empirical PMF (probability
+# mass function) and see if it fits.
 import matplotlib.pyplot as plt
 import numpy as np
 
