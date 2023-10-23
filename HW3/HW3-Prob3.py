@@ -42,7 +42,7 @@ for mu in mu_values:
         current_packet += 1
         queue_sizes.append(current_packet)
     # Plot n(t) for this simulation
-    plt.step(completion_times, queue_sizes, where='post', label=f'μ = {1/mu}')
+    plt.step(completion_times, queue_sizes, where='post', label=f'μ = {mu}')
 # Plot n(t) for different service rates
 plt.xlabel('Time (t)')
 plt.ylabel('n(t) (Number of Packets in the Queue)')
@@ -54,7 +54,7 @@ plt.show()
 # Calculate the average number of packets in the system for each service rate
 for mu in mu_values:
     average_packets = np.mean(queue_sizes)
-    print(f'Average number of packets in the system (μ = {1/mu}): {average_packets:.2f}')
+    print(f'Average number of packets in the system (μ = {mu}): {average_packets:.2f}')
 
 # Average number of packets in the system (μ = 0.1): 2520.50
 # Average number of packets in the system (μ = 0.16666666666666666): 2520.50
