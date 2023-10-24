@@ -1,15 +1,18 @@
 import math
 
-blocking_probability = 0.01
-arrival_rate = 40
-mean_service_time = 3
-A = arrival_rate * (1 / mean_service_time)
-N = 1
+def erlang_b(n, A):
+    numerator = (A**n) / math.factorial(n)
+    denominator = sum((A**k) / math.factorial(k) for k in range(n+1))
+    return numerator / denominator
+
+desired_blocking_probability = 0.01
+A = 120
+n = 0
 
 while True:
-    B = (A ** N) / math.factorial(N)
-    if B < blocking_probability:
+    blocking_probability = erlang_b(n, A)
+    if blocking_probability < desired_blocking_probability:
         break
-    N += 1
+    n += 1
 
-print("Number of VMs required to meet blocking probability < 0.01:", N)
+print(f"Number of VMs required to achieve a blocking probability < 0.01: {n}")
