@@ -1,61 +1,60 @@
+import simpy
 import random
+import matplotlib.pyplot as plt
 
 # Parameters
-lambda_val = 5  # Arrival rate
-mu_val = 6     # Service rate
+arrival_rate = 5  # Poisson arrival rate
+service_rate = 6  # Service rate
 simulation_time = 1000  # Total simulation time
 
-# Initialize simulation variables
-time = 0
-queue_length = 0
-event_list = []
+# Initialize variables
+env = simpy.Environment()
+queue = []
+n_data = []  # To store n(t) data
 
-# Lists to store Pn and E[n] estimates
-max_queue_length = 100  # Set a maximum possible queue length
-Pn_estimates = [0] * (10001)
-En_estimates = [0] * (simulation_time + 1)
-# Main simulation loop
-while time < simulation_time:
-    # Calculate Pn and En at each time step
-    print(time)
-    Pn_estimates[queue_length] += 1
-    En_estimates[int(time)] = queue_length
+def arrival_process(env):
+    global queue
+    while True:
+        interarrival_time = random.expovariate(arrival_rate)
+        yield env.timeout(interarrival_time)
+        queue.append(env.now)  # Arrival time
 
-    # Generate random exponential inter-arrival and service times
-    inter_arrival_time = random.expovariate(lambda_val)
-    service_time = random.expovariate(mu_val)
+def service_process(env):
+    global queue
+    while True:
+        if queue:
+            queue.pop(0)  # Remove the first packet (FIFO)
+            service_time = random.expovariate(service_rate)
+            yield env.timeout(service_time)
+        else:
+            yield env.timeout(0.01)  # Idle time
 
-    # Update time
-    time += inter_arrival_time
+def monitor_process(env):
+    global n_data
+    while True:
+        n_data.append(len(queue))
+        yield env.timeout(0.1)
 
-    if time > simulation_time:
-        break
+# Create and run the simulation
+env.process(arrival_process(env))
+env.process(service_process(env))
+env.process(monitor_process(env))
+env.run(until=simulation_time)
 
-    # If an arrival occurs before the simulation time, add it to the queue
-    queue_length += 1
+# Estimate Pn
+total_time = env.now
+Pn_estimates = [n_data.count(n) / total_time for n in set(n_data)]
 
-    # If service completes before the next arrival, decrement queue
-    if service_time < inter_arrival_time:
-        queue_length -= 1
-    elif queue_length > 0:
-        # Otherwise, schedule the next service event
-        event_list.append(time + service_time)
+# Estimate E[n]
+E_n = sum(n * P for n, P in zip(set(n_data), Pn_estimates))
 
-# Calculate the final Pn and En estimates
-for i in range(len(Pn_estimates)):
-    Pn_estimates[i] /= simulation_time
+# Print results
+print("Pn estimates:", Pn_estimates)
+print("E[n] estimate:", E_n)
 
-mean_queue_length = sum(En_estimates) / simulation_time
-
-# Compare with M/M/1 queue formulas
-rho = lambda_val / mu_val  # Traffic intensity
-theoretical_Pn = [(1 - rho) * (rho ** n) for n in range(len(Pn_estimates))]
-theoretical_mean_queue_length = rho / (1 - rho)
-
-# Output the results
-print("Time\tPn Estimate\tTheoretical Pn")
-for t in range(len(Pn_estimates)):
-    print(f"{t}\t{Pn_estimates[t]:.4f}\t{theoretical_Pn[t]:.4f}")
-
-print("\nEstimated Mean Queue Length:", mean_queue_length)
-print("Theoretical Mean Queue Length:", theoretical_mean_queue_length)
+# Plot n(t)
+plt.plot([i * 0.1 for i in range(len(n_data))], n_data)
+plt.xlabel('Time (t)')
+plt.ylabel('Number of Packets (n(t))')
+plt.title('Queue Length vs. Time')
+plt.show()
