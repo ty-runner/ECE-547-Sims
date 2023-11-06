@@ -1,3 +1,6 @@
+# Using your code from the last homework, generate a Poisson process N(t) with rate λ = 5.
+# Plot N(t) as a function of t. Do you see any patterns?
+
 import numpy as np
 import matplotlib.pyplot as plt
 
