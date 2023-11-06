@@ -1,0 +1,3 @@
+https://www.youtube.com/watch?v=Ycy4VWr3-24
+https://squidarth.com/demonstrating-congestion-control
+A discrete-event network sim: https://www.nsnam.org/docs/release/3.29/doxygen/group__congestion_ops.html
