@@ -11,62 +11,38 @@
 #wait in line to buy concessions or go directly to seats
 
 import simpy
-import random
 import statistics
+from theater import Theater
+from moviegoer import moviegoer_behavior
+import matplotlib.pyplot as plt
 
-wait_times = []
+wait_times_list = []
+NUM_CASHIERS = 2
+NUM_SERVERS = 3
+NUM_USHERS = 1
 
-class Theater(object):
-    def __init__(self, env, num_cashiers, num_servers, num_ushers):
-        self.env = env
-        self.cashier = simpy.Resource(env, num_cashiers)
-        self.servers = simpy.Resource(env, num_servers)
-        self.ushers = simpy.Resource(env, num_ushers)
+# Function to run the simulation with varying numbers of cashiers
+def run_simulation(num_cashiers):
+    env = simpy.Environment()
+    theater = Theater(env, num_cashiers, NUM_SERVERS, NUM_USHERS)
+    wait_times = []
 
-    def buy_ticket(self, moviegoer):
-        yield self.env.timeout(random.randint(1,3))
+    for i in range(50):
+        env.process(moviegoer_behavior(env, i, theater, wait_times))
+    
+    env.run()
+    avg_wait_time = statistics.mean(wait_times)
+    return avg_wait_time
 
-    def check_ticket(self, moviegoer):
-        yield self.env.timeout(3/60)
-
-    def sell_food(self, moviegoer):
-        yield self.env.timeout(random.randint(1,5))
-        
-def moviegoer_behavior(env, moviegoer, theater):
-    # moviegoer arrives at the theater
-    arrival_time = env.now
-
-    # moviegoer gets in line to buy a ticket
-    with theater.cashier.request() as request:
-        yield request
-        yield env.process(theater.buy_ticket(moviegoer))
-
-    # moviegoer waits in line to have the ticket checked
-    with theater.ushers.request() as request:
-        yield request
-        yield env.process(theater.check_ticket(moviegoer))
-
-    # moviegoer decides to buy concessions
-    if random.random() < 0.5:
-        # moviegoer gets in line to buy concessions
-        with theater.servers.request() as request:
-            yield request
-            yield env.process(theater.sell_food(moviegoer))
-
-    # moviegoer goes to the theater
-    wait_time = env.now - arrival_time
-    wait_times.append(wait_time)
-
-# set up the simulation environment
-env = simpy.Environment()
-theater = Theater(env, num_cashiers=2, num_servers=3, num_ushers=1)
-
-# generate moviegoers and run the simulation
-for i in range(50):
-    env.process(moviegoer_behavior(env, i, theater))
-
-env.run()
-
-# calculate and print the average wait time
-avg_wait_time = statistics.mean(wait_times)
-print("Average wait time:", round(avg_wait_time, 2), "minutes")
+# Run simulations with different numbers of cashiers
+avg_wait_time = run_simulation(NUM_CASHIERS)
+while avg_wait_time > 10:
+    avg_wait_time = run_simulation(NUM_CASHIERS)
+    wait_times_list.append(round(avg_wait_time, 2))
+    print("Average wait time with", NUM_CASHIERS, "cashiers:", round(avg_wait_time, 2), "minutes")
+    NUM_CASHIERS += 1
+plt.plot(range(2, NUM_CASHIERS), wait_times_list, marker='o', linestyle='-', color='b')
+plt.xlabel('Number of Cashiers')
+plt.ylabel('Average Wait Time (minutes)')
+plt.title('Impact of Number of Cashiers on Average Wait Time')
+plt.show()
