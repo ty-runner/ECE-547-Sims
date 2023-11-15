@@ -1,5 +1,4 @@
 import random
-import statistics
 
 CHANCE_OF_CONCESSIONS = 0.5
 
