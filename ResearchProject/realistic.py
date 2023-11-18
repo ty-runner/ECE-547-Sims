@@ -7,6 +7,7 @@ class NetworkNode:
         self.transmission_rate = transmission_rate
         self.processing_time = processing_time
         self.queue = simpy.Store(env)
+        self.total_time = 0
 
     def transmit_frame(self, frame):
         start_time = self.env.now
@@ -15,6 +16,7 @@ class NetworkNode:
         end_time = self.env.now
         total_time = end_time - start_time
         print(f"{self.name} transmitted frame in {total_time} time units")
+        self.total_time += total_time
 
     def process_frame(self, frame):
         start_time = self.env.now
@@ -23,6 +25,7 @@ class NetworkNode:
         end_time = self.env.now
         total_time = end_time - start_time
         print(f"{self.name} processed frame in {total_time} time units")
+        self.total_time += total_time
 
     def propagate_frame(self, frame):
         start_time = self.env.now
@@ -31,6 +34,7 @@ class NetworkNode:
         end_time = self.env.now
         total_time = end_time - start_time
         print(f"{self.name} propagated frame in {total_time} time units")
+        self.total_time += total_time
 
 def network_node(env, node, frame):
     yield env.process(node.transmit_frame(frame))
@@ -45,12 +49,13 @@ def main():
     node_A = NetworkNode(env, 'A', transmission_rate, processing_time)
     node_B = NetworkNode(env, 'B', transmission_rate, processing_time)
 
-    frame = "Hello, World!"  # Example frame
-
-    env.process(network_node(env, node_A, frame))
-    env.process(network_node(env, node_B, frame))
-
+    frameA = "Hello?"  # Example frame, length matters for tranmission time
+    frameB = "Hello, World!"  # Example frame, length matters for tranmission time
+    env.process(network_node(env, node_A, frameA))
+    env.process(network_node(env, node_B, frameB))
     env.run(until=30)  # Run the simulation for 30 time units
+    print(f"Total time for Node A: {node_A.total_time}")
+    print(f"Total time for Node B: {node_B.total_time}")
 
 if __name__ == '__main__':
     main()
