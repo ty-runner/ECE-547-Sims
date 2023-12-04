@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.svm import OneClassSVM
+from sklearn.utils import shuffle
 from sklearn.metrics import confusion_matrix, classification_report
 
 # Load the malicious dataset
@@ -22,6 +23,9 @@ df_combined = pd.concat([df_malicious, df_doh], ignore_index=True)
 # Exclude the first 5 columns (assuming they are 0-indexed)
 df_combined = df_combined.iloc[:, 5:]
 
+#Shuffle the DataFrame
+df_combined_shuffled = shuffle(df_combined, random_state=42)  # Set a random_state for reproducibility
+
 # Separate features and target variable
 X = df_combined.drop('Label', axis=1)
 y = df_combined['Label']
@@ -39,7 +43,7 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 # One-Class SVM model
-model = OneClassSVM(nu=0.05, kernel='rbf', gamma='auto')  # Adjust hyperparameters as needed
+model = OneClassSVM(nu=0.5, kernel='rbf', gamma='auto')  # Adjust hyperparameters as needed
 model.fit(X_train)
 
 # Predictions on the test set
