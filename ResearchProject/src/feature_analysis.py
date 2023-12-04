@@ -6,16 +6,25 @@ from sklearn.impute import SimpleImputer
 from sklearn.svm import OneClassSVM
 from sklearn.metrics import confusion_matrix, classification_report
 
-# Load the dataset
-file_path = "l1-doh.csv"
-df = pd.read_csv(file_path)
+# Load the malicious dataset
+malicious_file_path = "l2-malicious.csv"
+df_malicious = pd.read_csv(malicious_file_path)
+df_malicious['Label'] = 1  # Set label for malicious traffic
+
+# Load the DoH dataset
+doh_file_path = "l1-doh.csv"
+df_doh = pd.read_csv(doh_file_path)
+df_doh['Label'] = 0  # Set label for DoH traffic
+
+# Concatenate the datasets
+df_combined = pd.concat([df_malicious, df_doh], ignore_index=True)
 
 # Exclude the first 5 columns (assuming they are 0-indexed)
-df = df.iloc[:, 5:]
+df_combined = df_combined.iloc[:, 5:]
 
 # Separate features and target variable
-X = df.drop('Label', axis=1)
-y = df['Label']
+X = df_combined.drop('Label', axis=1)
+y = df_combined['Label']
 
 # Handle missing values (simple imputation)
 imputer = SimpleImputer(strategy='mean')
@@ -36,9 +45,9 @@ model.fit(X_train)
 # Predictions on the test set
 y_pred = model.predict(X_test)
 
-# Convert predictions to 0 (normal) and 1 (anomalous)
-y_pred[y_pred == 1] = 0  # Normal
-y_pred[y_pred == -1] = 1  # Anomalous
+# Convert predictions to 0 (DoH) and 1 (malicious)
+y_pred[y_pred == 1] = 0  # DoH
+y_pred[y_pred == -1] = 1  # Malicious
 
 # Evaluate the model
 print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
