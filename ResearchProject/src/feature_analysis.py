@@ -9,12 +9,12 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 # Load the malicious dataset
 malicious_file_path = "l2-malicious.csv"
-df_malicious = pd.read_csv(malicious_file_path)
+df_malicious = pd.read_csv(malicious_file_path, nrows=10000)
 df_malicious['Label'] = 1  # Set label for malicious traffic
 
 # Load the DoH dataset
 doh_file_path = "l1-doh.csv"
-df_doh = pd.read_csv(doh_file_path)
+df_doh = pd.read_csv(doh_file_path, nrows=10000)
 df_doh['Label'] = 0  # Set label for DoH traffic
 
 # Concatenate the datasets
@@ -43,7 +43,7 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 # One-Class SVM model
-model = OneClassSVM(nu=0.5, kernel='rbf', gamma='auto')  # Adjust hyperparameters as needed
+model = OneClassSVM(nu=0.2, kernel='rbf', gamma='auto')  # Adjust hyperparameters as needed
 model.fit(X_train)
 
 # Predictions on the test set
