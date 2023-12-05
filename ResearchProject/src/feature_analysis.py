@@ -14,9 +14,9 @@ df_malicious = pd.read_csv(malicious_file_path, nrows=10000)
 df_malicious['Label'] = 1  # Set label for malicious traffic
 
 # Load the DoH dataset
-doh_file_path = "l1-doh.csv"
+doh_file_path = "l2-benign.csv"
 df_doh = pd.read_csv(doh_file_path, nrows=10000)
-df_doh['Label'] = 0  # Set label for DoH traffic
+df_doh['Label'] = 0  # Set label for Benign DoH traffic
 
 # Concatenate the datasets
 df_combined = pd.concat([df_malicious, df_doh], ignore_index=True)
@@ -26,39 +26,41 @@ df_combined_shuffled = shuffle(df_combined, random_state=42)  # Set a random_sta
 
 # Separate features and target variable
 accuracies = {}
-for i in range(5, 30):
-    selected_columns = [i]  # Select the columns to be used as features
-    X = df_combined_shuffled.iloc[: , selected_columns]
-    y = df_combined_shuffled['Label']
+# for i in range(5, 34):
+#     selected_columns = [i]  # Select the columns to be used as features
+X = df_combined_shuffled.iloc[: , 5:34]
+y = df_combined_shuffled['Label']
 
-    # Handle missing values (simple imputation)
-    imputer = SimpleImputer(strategy='mean')
-    X_imputed = pd.DataFrame(imputer.fit_transform(X), columns=X.columns)
+# Handle missing values (simple imputation)
+imputer = SimpleImputer(strategy='mean')
+X_imputed = pd.DataFrame(imputer.fit_transform(X), columns=X.columns)
 
-    # Train-test split
-    X_train, X_test, y_train, y_test = train_test_split(X_imputed, y, test_size=0.2, random_state=42)
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X_imputed, y, test_size=0.2, random_state=42)
 
-    # Data preprocessing: Standardization
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+# Data preprocessing: Standardization
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-    # One-Class SVM model
-    model = OneClassSVM(nu=0.5, kernel='rbf', gamma='auto')  # Adjust hyperparameters as needed
-    model.fit(X_train)
+# One-Class SVM model
+model = OneClassSVM(nu=0.38, kernel='linear', gamma='auto')  # Adjust hyperparameters as needed
+model.fit(X_train)
 
-    # Predictions on the test set
-    y_pred = model.predict(X_test)
+# Predictions on the test set
+y_pred = model.predict(X_test)
 
-    # Convert predictions to 0 (DoH) and 1 (malicious)
-    y_pred[y_pred == 1] = 0  # DoH
-    y_pred[y_pred == -1] = 1  # Malicious
+# Convert predictions to 0 (DoH) and 1 (malicious)
+y_pred[y_pred == 1] = 0  # DoH
+y_pred[y_pred == -1] = 1  # Malicious
 
-    # Evaluate the model
-    #print({X.columns[0]})
-    #print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
-    #report = classification_report(y_test, y_pred)
-    report = accuracy_score(y_test, y_pred)
-    print("\nClassification Report:\n", report)
-    accuracies[X.columns[0]] = report
-print(accuracies)
+# Evaluate the model
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+report = classification_report(y_test, y_pred)
+#report = accuracy_score(y_test, y_pred)
+print("\nClassification Report:\n", report)
+# accuracies[X.columns[0]] = report
+# print(accuracies)
+# max_key = max(accuracies, key=accuracies.get)
+# max_value = accuracies[max_key]
+# print({max_key, max_value})
