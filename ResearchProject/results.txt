@@ -1,0 +1,9 @@
+nu = 0.4
+
+kernel type vs accuracy:
+- Linear: 0.74
+- rbf: 0.52
+- sigmoid: 0.46
+- poly degree 2: 0.42
+- poly degree 3: 0.44
+- ploy degree 4: 0.42 

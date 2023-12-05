@@ -44,7 +44,7 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 # One-Class SVM model
-model = OneClassSVM(nu=0.38, kernel='linear', gamma='auto')  # Adjust hyperparameters as needed
+model = OneClassSVM(nu=0.4, kernel='poly', degree=4, gamma='auto')  # Adjust hyperparameters as needed
 model.fit(X_train)
 
 # Predictions on the test set
