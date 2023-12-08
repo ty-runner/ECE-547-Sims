@@ -11,8 +11,6 @@ data = pd.read_csv('output.csv')
 data['Timestamp'] = pd.to_datetime(data['Timestamp'], unit='s')  # Convert to datetime
 data['Timestamp'] = data['Timestamp'].astype('int64') // 10**9  # Convert to Unix timestamp in seconds
 
-#data['Hour'] = data['Timestamp'].dt.hour  # Extract hour
-
 # Label encode 'Source IP', 'Destination IP', and 'Protocol'
 le_ip = LabelEncoder()
 data['Source IP'] = le_ip.fit_transform(data['Source IP'])
@@ -32,8 +30,8 @@ data['Protocol'] = le_protocol.fit_transform(data['Protocol'])
 # Convert 'Length' to a numeric data type
 data['Length'] = pd.to_numeric(data['Length'], errors='coerce')
 
-# Define excess packets threshold (adjust as needed)
-threshold = 200
+# Threshold is the classifying line that extracts the excess packets
+threshold = data.loc[:, 'Length'].mean()
 
 # Create target variable (1 for excess, 0 for normal)
 data['ExcessPackets'] = (data['Length'] > threshold).astype(int)

@@ -4,3 +4,5 @@ ResearchProject/src/l2-malicious.csv
 *.csv
 ResearchProject/src/bigFlows.pcap
 ResearchProject/src/pcaptocsv.py
+ResearchProject/src/Step2/pcaptocsv.py
+ResearchProject/src/Step2/bigFlows.pcap
