@@ -1,9 +1,10 @@
 nu = 0.4
-
+SVM DATA
 kernel type vs accuracy:
-- Linear: 0.74
-- rbf: 0.52
-- sigmoid: 0.46
+- Linear: 0.75
+- rbf: 0.56
+- sigmoid: 0.45
 - poly degree 2: 0.42
 - poly degree 3: 0.44
-- ploy degree 4: 0.42 
+- poly degree 4: 0.42 
+

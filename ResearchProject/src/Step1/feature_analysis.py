@@ -7,7 +7,17 @@ from sklearn.svm import OneClassSVM
 from sklearn.utils import shuffle
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import accuracy_score
-
+from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
+from sklearn.covariance import EllipticEnvelope
+from sklearn.cluster import KMeans
+from sklearn.svm import OneClassSVM
+from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.naive_bayes import GaussianNB
 # Load the malicious dataset
 malicious_file_path = "l2-malicious.csv"
 df_malicious = pd.read_csv(malicious_file_path, nrows=10000)
@@ -28,7 +38,7 @@ df_combined_shuffled = shuffle(df_combined, random_state=42)  # Set a random_sta
 accuracies = {}
 # for i in range(5, 34):
 #     selected_columns = [i]  # Select the columns to be used as features
-X = df_combined_shuffled.iloc[: , 5:34]
+X = df_combined_shuffled.iloc[: , 5:22]
 y = df_combined_shuffled['Label']
 
 # Handle missing values (simple imputation)
@@ -42,25 +52,30 @@ X_train, X_test, y_train, y_test = train_test_split(X_imputed, y, test_size=0.2,
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
+models = [
+    IsolationForest(contamination=0.4, random_state=42),
+    LocalOutlierFactor(contamination=0.4, novelty=True),
+    EllipticEnvelope(contamination=0.4, random_state=42),
+    KMeans(n_clusters=2, n_init=10, random_state=42),
+    GaussianNB(),
+    OneClassSVM(nu=0.4, kernel='linear', gamma='auto')
+]
+for model in models:
+    # Train the model
+    model.fit(X_train, y_train)
 
-# One-Class SVM model
-model = OneClassSVM(nu=0.4, kernel='linear', gamma='auto')  # Adjust hyperparameters as needed
-model.fit(X_train)
+    # Predictions on the test set
+    y_pred = model.predict(X_test)
 
-# Predictions on the test set
-y_pred = model.predict(X_test)
+    # Convert predictions to 0 (DoH) and 1 (malicious)
+    y_pred[y_pred == 1] = int(0)  # DoH
+    y_pred[y_pred == -1] = int(1)  # Malicious
 
-# Convert predictions to 0 (DoH) and 1 (malicious)
-y_pred[y_pred == 1] = 0  # DoH
-y_pred[y_pred == -1] = 1  # Malicious
-
-# Evaluate the model
-print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
-report = classification_report(y_test, y_pred)
-#report = accuracy_score(y_test, y_pred)
-print("\nClassification Report:\n", report)
+    # Evaluate the model
+    print("\nModel:", type(model).__name__)
+    print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+    report = classification_report(y_test, y_pred, zero_division=1)
+    print("\nClassification Report:\n", report)
+    print(accuracy_score(y_test, y_pred))
 # accuracies[X.columns[0]] = report
 # print(accuracies)
-# max_key = max(accuracies, key=accuracies.get)
-# max_value = accuracies[max_key]
-# print({max_key, max_value})
