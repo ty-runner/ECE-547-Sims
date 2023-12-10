@@ -18,6 +18,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import NearestNeighbors
 # Load the malicious dataset
 malicious_file_path = "l2-malicious.csv"
 df_malicious = pd.read_csv(malicious_file_path, nrows=10000)
@@ -38,7 +40,7 @@ df_combined_shuffled = shuffle(df_combined, random_state=42)  # Set a random_sta
 accuracies = {}
 # for i in range(5, 34):
 #     selected_columns = [i]  # Select the columns to be used as features
-X = df_combined_shuffled.iloc[: , 5:22]
+X = df_combined_shuffled.iloc[: , 5:20]
 y = df_combined_shuffled['Label']
 
 # Handle missing values (simple imputation)
@@ -56,8 +58,7 @@ models = [
     IsolationForest(contamination=0.4, random_state=42),
     LocalOutlierFactor(contamination=0.4, novelty=True),
     EllipticEnvelope(contamination=0.4, random_state=42),
-    KMeans(n_clusters=2, n_init=10, random_state=42),
-    GaussianNB(),
+    KMeans(n_clusters=2, n_init=10, random_state=42), #Incorrect
     OneClassSVM(nu=0.4, kernel='linear', gamma='auto')
 ]
 for model in models:
@@ -77,5 +78,12 @@ for model in models:
     report = classification_report(y_test, y_pred, zero_division=1)
     print("\nClassification Report:\n", report)
     print(accuracy_score(y_test, y_pred))
+# classifiers = [
+#     GaussianNB(),
+#     LogisticRegression(random_state=42),
+#     NearestNeighbors(n_neighbors=2, algorithm='ball_tree')
+# ]
+# for classifier in classifiers:
+    
 # accuracies[X.columns[0]] = report
 # print(accuracies)
