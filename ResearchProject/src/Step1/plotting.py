@@ -11,5 +11,5 @@ plt.title('Model Accuracies')
 plt.xlabel('Model')
 plt.ylabel('Accuracy')
 plt.ylim(0, 1)  # Set y-axis limit between 0 and 1 for accuracy values
-plt.xticks(rotation=25, ha='right')  # Rotate x-axis labels for better readability
+plt.xticks(rotation=10, ha='right')  # Rotate x-axis labels for better readability
 plt.show()
