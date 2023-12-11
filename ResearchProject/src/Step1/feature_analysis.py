@@ -33,12 +33,12 @@ from sklearn.ensemble import BaggingClassifier
 
 # Load the malicious dataset
 malicious_file_path = "l2-malicious.csv"
-df_malicious = pd.read_csv(malicious_file_path, nrows=15000)
+df_malicious = pd.read_csv(malicious_file_path, nrows=9000)
 df_malicious['Label'] = 1  # Set label for malicious traffic
 
 # Load the DoH dataset
 doh_file_path = "l2-benign.csv"
-df_doh = pd.read_csv(doh_file_path, nrows=15000)
+df_doh = pd.read_csv(doh_file_path, nrows=9000)
 df_doh['Label'] = 0  # Set label for Benign DoH traffic
 
 # Concatenate the datasets
@@ -100,4 +100,6 @@ for model in models:
     print("\nClassification Report:\n", report)
     accuracies[type(model).__name__] = accuracy_score(y_test, y_pred)
 
-print(accuracies)
+#sort accuracies least to greatest
+sorted_accuracies = sorted(accuracies.items(), key=lambda x: x[1])
+print(sorted_accuracies)
