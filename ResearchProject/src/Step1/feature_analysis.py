@@ -33,12 +33,12 @@ from sklearn.ensemble import BaggingClassifier
 
 # Load the malicious dataset
 malicious_file_path = "l2-malicious.csv"
-df_malicious = pd.read_csv(malicious_file_path, nrows=20000)
+df_malicious = pd.read_csv(malicious_file_path, nrows=15000)
 df_malicious['Label'] = 1  # Set label for malicious traffic
 
 # Load the DoH dataset
 doh_file_path = "l2-benign.csv"
-df_doh = pd.read_csv(doh_file_path, nrows=20000)
+df_doh = pd.read_csv(doh_file_path, nrows=15000)
 df_doh['Label'] = 0  # Set label for Benign DoH traffic
 
 # Concatenate the datasets
@@ -72,15 +72,15 @@ models = [
     DecisionTreeClassifier(random_state=42),
     OneClassSVM(nu=0.4, kernel='linear', gamma='auto'),
     RandomForestClassifier(n_estimators=100, random_state=42),
-    LogisticRegression(random_state=42, max_iter=1000),
-    XGBClassifier(random_state=42),
-    KNeighborsClassifier(n_neighbors=2),
-    SVC(kernel='linear', C=1.0, random_state=42),
-    GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=42),
-    AdaBoostClassifier(n_estimators=100, random_state=42),
-    GaussianNB(),
-    MLPClassifier(random_state=42, max_iter=1000),
-    BaggingClassifier(random_state=42)
+    LogisticRegression(random_state=42, max_iter=1000)
+    # XGBClassifier(random_state=42),
+    # KNeighborsClassifier(n_neighbors=2),
+    # SVC(kernel='linear', C=1.0, random_state=42),
+    # GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=42),
+    # AdaBoostClassifier(n_estimators=100, random_state=42),
+    # GaussianNB(),
+    # MLPClassifier(random_state=42, max_iter=1000),
+    # BaggingClassifier(random_state=42)
 ]
 for model in models:
     # Train the model
